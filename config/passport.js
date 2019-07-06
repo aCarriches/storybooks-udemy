@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 
 const keys = require('./keys');
 
+const User = mongoose.model('users')
+
 
 module.exports = passport => {
   passport.use(
@@ -12,8 +14,32 @@ module.exports = passport => {
       callbackURL: '/auth/google/callback',
       proxy: true
     }, (accessToken, refreshToken, profile, done) => {
-      console.log(accessToken);
-      console.log(profile);
+      const img = profile.photos[0].value.substring(0, profile.photos[0].value.indexOf('?')) || profile.photos[0].value;
+
+      const newUser = {
+        googleID: profile.id,
+        email: profile.emails[0].value,
+        firstName: profile.name.givenName,
+        lastName: profile.name.familyName,
+        image: img
+      };
+
+      User.findOne({ googleID: profile.id })
+        .then(user => {
+          if (user) {
+            done(null, user);
+          } else {
+            new User(newUser).save()
+              .then(user => done(null, user));
+          }
+        })
     })
   );
+
+  passport.serializeUser((user, done) => {
+    done(null, user.id)
+  });
+  passport.deserializeUser((id, done) => {
+    User.findById(id).then(user => done(null, user));
+  })
 }
