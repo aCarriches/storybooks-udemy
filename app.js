@@ -15,7 +15,7 @@ const keys = require('./config/keys');
 const { truncate, stripTags, formatDate, select, editIcon } = require('./helpers/hbs');
 
 // Load models
-require('./models/User');
+// require('./models/User');
 require('./models/Story');
 
 // Load routes
