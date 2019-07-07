@@ -1,5 +1,6 @@
 const express = require('express');
 const passport = require('passport');
+const {ensureAuthenticated} = require('../helpers/auth');
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ router.get('/verify', (req, res) => {
   }
 })
 
-router.get('/logout', (req,res) => {
+router.get('/logout', ensureAuthenticated, (req,res) => {
   req.logout();
   res.redirect('/');
 })
